@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class Database {
 
-    public static final String CONN_STR = "jdbc:sqlite:/tmp/kafkaconsumer.db";
+    public static final String CONN_STR = "jdbc:sqlite:/db/kafkaconsumer.db";
     public static final String INITIALIZATION_SCRIPT = "src/main/resources/init.sql";
 
     public static Connection getConnection() throws SQLException {

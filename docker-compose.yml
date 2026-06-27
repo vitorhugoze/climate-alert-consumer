@@ -1,0 +1,13 @@
+services:
+  climate-alert-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: climate-alert-consumer:latest
+    container_name: climate-alert-consumer
+    restart: unless-stopped
+    volumes:
+      - consumer_db:/db
+
+volumes:
+  consumer_db:
