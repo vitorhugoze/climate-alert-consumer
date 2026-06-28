@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MessagingService {
 
-    private static final String API_URL = "http://localhost:12052";
+    private static final String API_URL = System.getenv("WAHA_URL") != null ? System.getenv("WAHA_URL") : "http://localhost:12052";
     private static final String API_KEY = System.getenv("WAHA_API_KEY");
     private static final Gson gson = new Gson();
 

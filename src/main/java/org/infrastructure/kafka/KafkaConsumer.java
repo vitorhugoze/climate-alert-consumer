@@ -14,9 +14,11 @@ import java.util.Properties;
 
 public class KafkaConsumer {
 
+    private static final String BROKER_ADDRESS = System.getenv("BROKER_ADDRESS") != null ? System.getenv("BROKER_ADDRESS") : "localhost:9092";
+
     public static void startConsumer() {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:12055");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BROKER_ADDRESS);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, WeatherDeserializer.class.getName());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "climate-group-1");

@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     volumes:
       - consumer_db:/db
+    environment:
+      - BROKER_ADDRESS=kafka-broker:9092
 
 volumes:
   consumer_db:
