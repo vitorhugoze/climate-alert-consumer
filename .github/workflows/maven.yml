@@ -1,0 +1,64 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # necessário para criar e publicar a git tag
+      packages: write   # necessário para publicar no GHCR
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # --- Fast-fail: valida compilação antes do Docker build ---
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package -DskipTests --file pom.xml
+
+      # --- Docker ---
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          no-cache: true
+          tags: |
+            ghcr.io/vitorhugoze/climate-alert-consumer:sha-${{ env.SHORT_SHA }}
+            ghcr.io/vitorhugoze/climate-alert-consumer:latest
+
+      # --- Git tag ---
+      - name: Create and push git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag sha-${{ env.SHORT_SHA }}
+          git push origin sha-${{ env.SHORT_SHA }}
